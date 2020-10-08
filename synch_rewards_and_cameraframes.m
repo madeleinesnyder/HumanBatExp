@@ -1,16 +1,17 @@
 % Synchronize reward with cameras
+% MCS 10/1/20
 
 % Note: change this into a function
 
 %%%%%%%% Pick date, os, session %%%%%%%%%%
-day = '200927';
-today = datestr(now,30); today = today(3:8);
+day = '201006';
+%day = datestr(now,30); today = today(3:8);
 
-% Pick OS
+% Pick OS (If PC, check that drive is mounted as the letter in line 22)
 os_var = 'mac';
 
 % Pick session
-session = '1';
+session = '6';
 
 %%%%%%%%%%%% Do not change below %%%%%%%%%
 
