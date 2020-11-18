@@ -1,4 +1,5 @@
-% Script to test out analysis of the recorded audio and TTL 
+% Script to test out analysis of the recorded audio and TTL reads in all _1
+% _2 etc in sequence
 
 % Setup. Change these parameters to pull the data you want. 
 bat1 = 'Jonnie'; % Clementine
@@ -37,20 +38,29 @@ if strcmp(storage_location, 'local')
     ttl_wav = [root_save_mic_local filesep dirlist(end).name];
 elseif strcmp(storage_location, 'server1')
     dirlist = dir(fullfile(root_save_mic_server1,filetype)); 
-    ttl_wav = [root_save_mic_server1 filesep dirlist(end).name];
+    ttl_wav_files = {};
+    for i=1:length(dirlist)
+        ttl_wav_files{i} = [root_save_mic_server1 filesep dirlist(i).name];
+    end
 elseif strcmp(storage_location, 'ext_drive')
     disp("Which drive? Configure this!");
 end
 
-% Read in the TTL WAV file
-[y_ttl,Fs_ttl] = audioread(ttl_wav);
-num_ch = size(y_ttl,2);
+% Read in the TTL WAV file(s)
+y_ttl_full=[]; Fs_ttl_full = [];
+for i=1:length(dirlist)
+    [y_ttl_tmp,Fs_ttl_tmp] = audioread(ttl_wav_files{i});
+    num_ch(i) = size(y_ttl_tmp,2);
+    y_ttl_full = [y_ttl_full;y_ttl_tmp];
+    Fs_ttl_full = [Fs_ttl_full;Fs_ttl_tmp];
+end
 
 % Plot the ttl to make sure it's recorded
-dt = 1/Fs_ttl;
-t_ttl = 0:dt:(length(y_ttl)*dt)-dt;
+dt = 1/sum(Fs_ttl_full); % NOT SURE IF THIS IS RIGHT. COuld just be 19200
+dt = 1/Fs_ttl_full(1); % I THINK IT"S JUST 19200 because that's what the MOTU says.....
+t_ttl = 0:dt:(length(y_ttl_full)*dt)-dt;
 figure(); hold on;
-title('Raw TTL Pulse');plot(t_ttl(1:end),y_ttl(1:end)); xlabel('Seconds'); ylabel('Amplitude');
+title('Raw TTL Pulse');plot(t_ttl(1:end),y_ttl_full(1:end)); xlabel('Seconds'); ylabel('Amplitude');
 
 %% Examine the actual audio WAV from mic1
 

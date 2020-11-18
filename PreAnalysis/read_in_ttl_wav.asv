@@ -6,10 +6,10 @@ bat2 = 'Polly'; % Ovaltine/Poutine
 bat3 = 'Georgia'; % Saltine
 bat4 = 'Ringa'; % Valentine
 
-day = '201116'; % Date [yrmoda]
+day = '201117'; % Date [yrmoda]
 paradigm = 'HLRTask'; %HLRTask, RecOnly, DividedHLRTask...
 HLRBat = 'Georgia'; % Clementine, Poutine, Saltine, Valentine, Jonnie, Polly, Georgia, Ringa
-session = '4'; 
+session = '3'; 
 storage_location = 'server1'; % server1, local, ext_drive...
 
 %% Load in the root paths of the various storage places.
@@ -42,7 +42,7 @@ elseif strcmp(storage_location, 'ext_drive')
     disp("Which drive? Configure this!");
 end
 
-% Read in the TTL WAV file
+% Read in the WAV file
 [y_ttl,Fs_ttl] = audioread(ttl_wav);
 num_ch = size(y_ttl,2);
 
@@ -88,7 +88,7 @@ title('Raw Amplitude of Microphone 1');
 plot(t_mic1,y_mic1); xlabel('Seconds'); ylabel('Amplitude');
 
 %% Examine the dca (Decawave) WAV
-% Find the dca files you want
+% Find the ttl files you want
 if strcmp(paradigm,'FeedTask')
     filetype = strcat(bat1(1:2),bat2(1:2),bat3(1:2),bat4(1:2),'_',day,'*',paradigm,'*','dca','*');
 elseif strcmp(paradigm,'HLRTask')
@@ -100,10 +100,10 @@ end
 % Load in the data
 if strcmp(storage_location, 'local')
     dirlist = dir(fullfile(root_save_mic_local,filetype)); 
-    dca_wav = [root_save_mic_local filesep dirlist(end).name];
+    dca_wav = [root_save_dca_local filesep dirlist(end).name];
 elseif strcmp(storage_location, 'server1')
     dirlist = dir(fullfile(root_save_mic_server1,filetype)); 
-    dca_wav = [root_save_mic_server1 filesep dirlist(end).name];
+    dca_wav = [root_save_dca_server1 filesep dirlist(end).name];
 elseif strcmp(storage_location, 'ext_drive')
     disp("Which drive? Configure this!");
 end
@@ -146,23 +146,23 @@ plot(t_ttl(1:100000),y_ttl(1:100000)); xlabel('Seconds'); ylabel('Amplitude');
 
 % Load in the data
 if strcmp(storage_location, 'local')
-    dcaFile = dir(fullfile(root_save_dca_local,filesep,['decawave_' day '*' session '.mat']));
-    deca = load([root_save_dca_local,filesep,dcaFile.name]);
+    dirlist = dir(fullfile(root_save_mic_local,filetype)); 
+    dca_wav = [root_save_dca_local filesep dirlist(end).name];
 elseif strcmp(storage_location, 'server1')
-    dcaFile = dir(fullfile(root_save_dca_server1,filesep,['decawave_' day '*' session,'*']));
-    deca = load([root_save_dca_server1,filesep,dcaFile.name]);
+    dirlist = dir(fullfile(root_save_mic_server1,filetype)); 
+    dca_wav = [root_save_dca_server1 filesep dirlist(end).name];
 elseif strcmp(storage_location, 'ext_drive')
     disp("Which drive? Configure this!");
 end
 
+dcaFile = dir(fullfile(root_save_dca_local,filesep,['decawave_' day '*' session '.mat']));
+deca = load([root_save_dca_local,filesep,dcaFile.name]);
 figure(); hold on;
 title('Decawave Data');
 scatter3(deca.UD.Pos(1,1,:),deca.UD.Pos(2,1,:),deca.UD.Pos(3,1,:),'r');
 
-%% Plot the decawave x and y to make sure the drift is ok. 
-
+%% 
 figure();
-title('Decawave X, Y, and trace');
 subplot(2,1,2); hold on;
 plot(t_mic1(1:end),y_mic1(1:end)); xlabel('Seconds'); ylabel('Amplitude');
 plot(t_ttl(1:end),y_ttl(1:end)); xlabel('Seconds'); ylabel('Amplitude');

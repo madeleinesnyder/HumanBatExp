@@ -5,7 +5,7 @@
 %% Initiaize communication anche check for errors
 clear all; close all; clc;
 
-sess=4;
+sess=2;
 
 %Create Serial Port Object, wait 1 second and check pin status
 s = serialport('COM6',115200,'Timeout',3);
